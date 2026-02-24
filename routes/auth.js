@@ -1,7 +1,7 @@
 // routes/auth.js — Full Auth & OTP Logic for CRM
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcryptjs");
 const db = require('../database');
 
 function generateOTP() { return Math.floor(100000 + Math.random() * 900000).toString(); }
