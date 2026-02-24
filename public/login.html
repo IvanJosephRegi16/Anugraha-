@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — Anugraha Kirloskar CRM</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        body {
+            background: #f4f7f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #eee;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h1 {
+            color: #1f7a1f;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Anugraha Kirloskar</h1>
+            <p>CRM Dashboard Login</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Phone or Email</label>
+                <input type="text" id="identifier" placeholder="Enter phone/email" value="8086596811" required />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" value="Happyholidays@1month" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;" id="loginBtn">Login</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center; font-size: 14px;">
+            <a href="signup.html" style="color: #1f7a1f; text-decoration: none; font-weight: 600;">Create Account</a> |
+            <a href="forgot-password.html" style="color: #666; text-decoration: none;">Forgot Password?</a>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loginBtn = document.getElementById('loginBtn');
+            const alertBox = document.getElementById('alertBox');
+
+            loginBtn.disabled = true;
+            loginBtn.innerText = 'Signing in...';
+            alertBox.style.display = 'none';
+
+            const response = await apiCall('/api/login', {
+                identifier: document.getElementById('identifier').value,
+                password: document.getElementById('password').value
+            });
+
+            if (response.success) {
+                window.location.href = 'dashboard.html';
+            } else {
+                alertBox.className = 'alert alert-error';
+                alertBox.innerText = response.message;
+                alertBox.style.display = 'block';
+                loginBtn.disabled = false;
+                loginBtn.innerText = 'Login';
+            }
+        });
+    </script>
+</body>
+
+</html>

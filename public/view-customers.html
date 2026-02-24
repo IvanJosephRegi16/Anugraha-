@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Customers — Anugraha Kirloskar CRM</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group label {
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-lead {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-converted {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-not-converted {
+            background: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">AK</div>
+                <div class="logo-text">ANUGRAHA KIRLOSKAR</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="new-customer.html" class="nav-item">
+                    <span class="nav-icon">➕</span>
+                    <span class="nav-text">New Customer</span>
+                </a>
+                <a href="view-customers.html" class="nav-item active">
+                    <span class="nav-icon">👁</span>
+                    <span class="nav-text">View Customers</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Reports</span>
+                </a>
+                <a href="follow-ups.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span class="nav-text">Follow Ups</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+                <div style="flex: 1;"></div>
+                <a href="#" class="nav-item" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button id="sidebarToggle" class="btn" style="background: none; font-size: 20px;">☰</button>
+                    <h2 style="font-size: 18px; font-weight: 600;">Customer Database</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <a href="follow-ups.html" class="notification-container" id="notifBell">
+                        <i class="fas fa-bell notification-bell"></i>
+                        <span class="notification-badge" id="notifBadge">0</span>
+                    </a>
+                    <div class="user-profile">
+                        <span class="user-name" id="userDisplayName">User</span>
+                        <div class="logo-icon" style="width: 36px; height: 36px; border-radius: 50%;" id="userInitial">U
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Filters -->
+            <section class="filter-bar">
+                <div class="filter-group">
+                    <label>Search Name/Phone</label>
+                    <input type="text" id="filterSearch" placeholder="Type here...">
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="filterStatus">
+                        <option value="">All Status</option>
+                        <option value="Lead">Lead</option>
+                        <option value="Converted">Converted</option>
+                        <option value="Not Converted">Not Converted</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Product</label>
+                    <select id="filterProduct">
+                        <option value="">All Products</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>District</label>
+                    <select id="filterDistrict">
+                        <option value="">All Districts</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Start Date</label>
+                    <input type="date" id="filterStart">
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-primary" onclick="loadCustomers()"
+                        style="width: 100%; padding: 8px; display: none;">Apply Filters</button>
+                    <div
+                        style="font-size: 11px; color: var(--primary-teal); font-weight: 600; text-align: center; width: 100%;">
+                        ✨ Live Filtering Active</div>
+                </div>
+            </section>
+
+            <!-- Table -->
+            <div class="card" style="padding: 0;">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Product</th>
+                                <th>Status</th>
+                                <th>District</th>
+                                <th>Follow-up</th>
+                                <th>Outcome</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px;">No data found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        async function loadFilters() {
+            const res = await fetch('/api/crm/settings');
+            const data = await res.json();
+            if (!data.success) return;
+
+            const populate = (id, list) => {
+                const el = document.getElementById(id);
+                list.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = opt.text = item.value;
+                    el.add(opt);
+                });
+            }
+            populate('filterDistrict', data.districts);
+            populate('filterProduct', data.products);
+        }
+
+        async function loadCustomers() {
+            const search = document.getElementById('filterSearch').value;
+            const status = document.getElementById('filterStatus').value;
+            const product = document.getElementById('filterProduct').value;
+            const district = document.getElementById('filterDistrict').value;
+            const start = document.getElementById('filterStart').value;
+
+            const params = new URLSearchParams({ search, status, product, district, start_date: start });
+            const res = await fetch('/api/crm/customers?' + params.toString());
+            const data = await res.json();
+
+            const tbody = document.getElementById('customersTableBody');
+            tbody.innerHTML = '';
+
+            if (data.customers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px;">No matching records found</td></tr>';
+                return;
+            }
+
+            data.customers.forEach(c => {
+                const badgeClass = 'badge-' + c.status.toLowerCase().replace(' ', '-');
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${c.call_date}</td>
+                    <td style="font-weight: 500;">${c.name}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.product || '—'}</td>
+                    <td><span class="status-badge ${badgeClass}">${c.status}</span></td>
+                    <td>${c.district || '—'}</td>
+                    <td style="color: ${c.follow_up_date ? '#1f7a1f' : '#888'}">${c.follow_up_date || '—'}</td>
+                    <td>${c.outcome || '—'}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="window.location.href='new-customer.html?editId=${c.call_id}'" style="padding: 4px 8px; font-size: 11px;">Edit</button>
+                        <button class="btn" onclick="deleteCustomer(${c.id})" style="padding: 4px 8px; background: #ffebee; color: #c62828; font-size: 11px; margin-left: 5px;">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function deleteCustomer(id) {
+            if (!confirm('Are you sure you want to delete this customer and all their call history?')) return;
+            const res = await fetch('/api/crm/customers/' + id, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                loadCustomers();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        }
+
+        // Debounce for live search
+        function debounce(func, timeout = 300) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
+
+        const devouncedLoad = debounce(loadCustomers);
+
+        // Add Event Listeners for Live Filtering
+        document.getElementById('filterSearch').addEventListener('input', devouncedLoad);
+        document.getElementById('filterStatus').addEventListener('change', loadCustomers);
+        document.getElementById('filterProduct').addEventListener('change', loadCustomers);
+        document.getElementById('filterDistrict').addEventListener('change', loadCustomers);
+        document.getElementById('filterStart').addEventListener('change', loadCustomers);
+
+        loadFilters().then(loadCustomers);
+    </script>
+</body>
+
+</html>

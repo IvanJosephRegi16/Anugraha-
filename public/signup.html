@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup — Anugraha Kirloskar CRM</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        body {
+            background: #f4f7f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid #eee;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .auth-header h1 {
+            color: #1f7a1f;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Anugraha Kirloskar</h1>
+            <p>Staff Registration</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="signupForm">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="fullname" placeholder="John Doe" required />
+            </div>
+            <div class="form-group">
+                <label>Phone Number (10 Digits)</label>
+                <input type="text" id="phone" placeholder="9876543210" maxlength="10" required />
+            </div>
+            <div class="form-group">
+                <label>Email (Optional)</label>
+                <input type="email" id="email" placeholder="john@example.com" />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" required />
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="••••••••" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;" id="signupBtn">Create Account</button>
+        </form>
+
+        <div style="margin-top: 15px; text-align: center; font-size: 14px;">
+            Already have an account? <a href="login.html"
+                style="color: #1f7a1f; text-decoration: none; font-weight: 600;">Login here</a>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const signupBtn = document.getElementById('signupBtn');
+            const alertBox = document.getElementById('alertBox');
+
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alertBox.className = 'alert alert-error';
+                alertBox.innerText = 'Passwords do not match.';
+                alertBox.style.display = 'block';
+                return;
+            }
+
+            signupBtn.disabled = true;
+            signupBtn.innerText = 'Creating...';
+            alertBox.style.display = 'none';
+
+            const response = await apiCall('/api/signup', {
+                fullname: document.getElementById('fullname').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                password: password,
+                confirmPassword: confirmPassword
+            });
+
+            if (response.success) {
+                alertBox.className = 'alert alert-success';
+                alertBox.innerText = 'Account created! Redirecting...';
+                alertBox.style.display = 'block';
+                setTimeout(() => window.location.href = 'login.html', 1500);
+            } else {
+                alertBox.className = 'alert alert-error';
+                alertBox.innerText = response.message;
+                alertBox.style.display = 'block';
+                signupBtn.disabled = false;
+                signupBtn.innerText = 'Create Account';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Anugraha Kirloskar CRM</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Premium UI Foundations -->
+    <div id="loading-screen">
+        <div class="loader-spinner"></div>
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">AK</div>
+                <div class="logo-text">ANUGRAHA KIRLOSKAR</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="new-customer.html" class="nav-item">
+                    <span class="nav-icon">➕</span>
+                    <span class="nav-text">New Customer</span>
+                </a>
+                <a href="view-customers.html" class="nav-item">
+                    <span class="nav-icon">👁</span>
+                    <span class="nav-text">View Customers</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Reports</span>
+                </a>
+                <a href="follow-ups.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span class="nav-text">Follow Ups</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+                <div style="flex: 1;"></div>
+                <a href="#" class="nav-item" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button id="sidebarToggle" class="btn" style="background: none; font-size: 20px;">☰</button>
+                    <h2 style="font-size: 18px; font-weight: 600;">Dashboard Overview</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <a href="follow-ups.html" class="notification-container" id="notifBell">
+                        <i class="fas fa-bell notification-bell"></i>
+                        <span class="notification-badge" id="notifBadge">0</span>
+                    </a>
+                    <div class="user-profile">
+                        <span class="user-name" id="userDisplayName">Loading...</span>
+                        <div class="logo-icon" style="width: 36px; height: 36px; border-radius: 50%;" id="userInitial">U
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="card" id="kpiCard">
+                <div class="card-header" onclick="toggleSection('kpiCard')">
+                    <h3 style="font-size: 16px;">Key Statistics</h3>
+                    <span class="toggle-icon"></span>
+                </div>
+                <div class="collapsible-content">
+                    <section class="kpi-grid" id="kpiContainer" style="padding: 24px;">
+                        <div class="kpi-card">
+                            <span class="kpi-label">Total Customers</span>
+                            <span class="kpi-count">—</span>
+                        </div>
+                        <div class="kpi-card">
+                            <span class="kpi-label">Total Converted</span>
+                            <span class="kpi-count">—</span>
+                        </div>
+                        <div class="kpi-card">
+                            <span class="kpi-label">Not Converted</span>
+                            <span class="kpi-count">—</span>
+                        </div>
+                        <div class="kpi-card">
+                            <span class="kpi-label">Conversion Rate</span>
+                            <span class="kpi-count">—%</span>
+                        </div>
+                        <div class="kpi-card">
+                            <span class="kpi-label">Today Calls</span>
+                            <span class="kpi-count">—</span>
+                        </div>
+                        <div class="kpi-card">
+                            <span class="kpi-label">Month Calls</span>
+                            <span class="kpi-count">—</span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="card" id="followUpsCard">
+                <div class="card-header" onclick="toggleSection('followUpsCard')">
+                    <h3 style="font-size: 16px;">Today's Follow-ups</h3>
+                    <span class="toggle-icon"></span>
+                </div>
+                <div class="table-container collapsible-content">
+                    <table style="margin-top: 15px;">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="followUpsTable">
+                            <tr>
+                                <td colspan="4" style="text-align:center;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scroll Controls -->
+    <div class="scroll-controls">
+        <button id="scrollTop" class="btn-scroll" onclick="window.scrollTo(0, 0)"><i
+                class="fas fa-chevron-up"></i></button>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('collapsed');
+        }
+
+        async function loadDashboard() {
+            const res = await fetch('/api/crm/stats');
+            const data = await res.json();
+            if (!data.success) return;
+
+            // Update KPIs
+            const kpis = data.kpis;
+            const kpiCards = document.querySelectorAll('.kpi-count');
+            if (kpiCards.length >= 6) {
+                kpiCards[0].innerText = kpis.totalCustomers;
+                kpiCards[1].innerText = kpis.totalConverted;
+                kpiCards[2].innerText = kpis.totalNotConverted;
+                kpiCards[3].innerText = kpis.conversionRate + '%';
+                kpiCards[4].innerText = kpis.todayCalls;
+                kpiCards[5].innerText = kpis.monthCalls;
+            }
+
+            // Update Notification Badge
+            const badge = document.getElementById('notifBadge');
+            if (data.overdueCount > 0) {
+                badge.innerText = data.overdueCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Populate Follow-ups
+            const followUpTable = document.getElementById('followUpsTable');
+            followUpTable.innerHTML = '';
+            if (data.todayFollowUps.length === 0) {
+                followUpTable.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">No follow-ups for today!</td></tr>';
+            } else {
+                data.todayFollowUps.forEach(f => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${f.name}</td>
+                        <td>${f.phone}</td>
+                        <td><span class="status-badge status-${f.status.toLowerCase().replace(' ', '-')}">${f.status}</span></td>
+                        <td><button class="btn btn-primary" onclick="window.location.href='new-customer.html?editId=${f.call_id}'" style="padding: 4px 8px; font-size: 11px;">Update</button></td>
+                    `;
+                    followUpTable.appendChild(row);
+                });
+            }
+        }
+
+        loadDashboard();
+
+        // Core UI Logic
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loading-screen');
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+            }, 800);
+        });
+
+        // Ripple Effect
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn') || e.target.closest('.nav-item')) {
+                const button = e.target.closest('.btn') || e.target.closest('.nav-item');
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                const rect = button.getBoundingClientRect();
+                ripple.style.left = `${e.clientX - rect.left}px`;
+                ripple.style.top = `${e.clientY - rect.top}px`;
+                button.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            }
+        });
+    </script>
+</body>
+
+</html>

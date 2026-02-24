@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Settings — Anugraha Kirloskar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .setting-list {
+            margin-top: 15px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .delete-btn {
+            color: #d32f2f;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .add-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">AK</div>
+                <div class="logo-text">ANUGRAHA KIRLOSKAR</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span><span
+                        class="nav-text">Dashboard</span></a>
+                <a href="new-customer.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-text">New
+                        Customer</span></a>
+                <a href="view-customers.html" class="nav-item"><span class="nav-icon">👁</span><span
+                        class="nav-text">View Customers</span></a>
+                <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span><span
+                        class="nav-text">Reports</span></a>
+                <a href="follow-ups.html" class="nav-item"><span class="nav-icon">🔔</span><span class="nav-text">Follow
+                        Ups</span></a>
+                <a href="settings.html" class="nav-item active"><span class="nav-icon">⚙</span><span
+                        class="nav-text">Settings</span></a>
+                <div style="flex: 1;"></div>
+                <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span><span
+                        class="nav-text">Logout</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-nav">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button id="sidebarToggle" class="btn" style="background: none; font-size: 20px;">☰</button>
+                    <h2 style="font-size: 18px; font-weight: 600;">System Settings</h2>
+                </div>
+                <div class="user-profile">
+                    <span class="user-name" id="userDisplayName">User</span>
+                    <div class="logo-icon" style="width: 36px; height: 36px; border-radius: 50%;" id="userInitial">U
+                    </div>
+                </div>
+            </header>
+
+            <div class="settings-grid">
+                <!-- Products -->
+                <div class="card">
+                    <h3>📦 Product List</h3>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Manage available products for customer
+                        leads.</p>
+                    <div class="add-box">
+                        <input type="text" id="newProduct" placeholder="Add new product...">
+                        <button class="btn btn-primary" onclick="addSetting('product', 'newProduct')">Add</button>
+                    </div>
+                    <div id="listProducts" class="setting-list"></div>
+                </div>
+
+                <!-- Sources -->
+                <div class="card">
+                    <h3>🔗 Lead Sources</h3>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Manage marketing channels (e.g.
+                        WhatsApp, Facebook).</p>
+                    <div class="add-box">
+                        <input type="text" id="newSource" placeholder="Add new source...">
+                        <button class="btn btn-primary" onclick="addSetting('source', 'newSource')">Add</button>
+                    </div>
+                    <div id="listSources" class="setting-list"></div>
+                </div>
+
+                <!-- Districts -->
+                <div class="card">
+                    <h3>📍 Districts</h3>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Manage service areas/districts.</p>
+                    <div class="add-box">
+                        <input type="text" id="newDistrict" placeholder="Add new district...">
+                        <button class="btn btn-primary" onclick="addSetting('district', 'newDistrict')">Add</button>
+                    </div>
+                    <div id="listDistricts" class="setting-list"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        async function loadSettings() {
+            const res = await fetch('/api/crm/settings');
+            const data = await res.json();
+            if (!data.success) return;
+
+            renderSettings('listProducts', data.products);
+            renderSettings('listSources', data.sources);
+            renderSettings('listDistricts', data.districts);
+        }
+
+        function renderSettings(listId, items) {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'setting-item';
+                div.innerHTML = `
+                    <span>${item.value}</span>
+                    <button class="delete-btn" onclick="deleteSetting(${item.id})">🗑️</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        async function addSetting(category, inputId) {
+            const input = document.getElementById(inputId);
+            const value = input.value.trim();
+            if (!value) return;
+
+            const res = await apiCall('/api/crm/settings', { category, value });
+            if (res.success) {
+                input.value = '';
+                loadSettings();
+            }
+        }
+
+        async function deleteSetting(id) {
+            if (!confirm('Delete this setting?')) return;
+            const res = await fetch('/api/crm/settings/' + id, { method: 'DELETE' });
+            if ((await res.json()).success) loadSettings();
+        }
+
+        loadSettings();
+    </script>
+</body>
+
+</html>

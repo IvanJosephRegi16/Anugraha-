@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow Ups — Anugraha Kirloskar CRM</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .follow-up-card {
+            margin-bottom: 20px;
+            padding: 25px;
+        }
+
+        .date-badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .overdue-bg {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .today-bg {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .upcoming-bg {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .section-header {
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-header h2 {
+            font-family: 'Outfit';
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-teal);
+        }
+
+        .count-pill {
+            background: var(--primary-light);
+            color: var(--primary-teal);
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Premium UI Foundations -->
+    <div id="loading-screen">
+        <div class="loader-spinner"></div>
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">AK</div>
+                <div class="logo-text">ANUGRAHA KIRLOSKAR</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="new-customer.html" class="nav-item">
+                    <span class="nav-icon">➕</span>
+                    <span class="nav-text">New Customer</span>
+                </a>
+                <a href="view-customers.html" class="nav-item">
+                    <span class="nav-icon">👁</span>
+                    <span class="nav-text">View Customers</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Reports</span>
+                </a>
+                <a href="follow-ups.html" class="nav-item active">
+                    <span class="nav-icon">🔔</span>
+                    <span class="nav-text">Follow Ups</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+                <div style="flex: 1;"></div>
+                <a href="#" class="nav-item" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button id="sidebarToggle" class="btn" style="background: none; font-size: 20px;">☰</button>
+                    <h2 style="font-size: 18px; font-weight: 600;">Follow Up Schedule</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <a href="follow-ups.html" class="notification-container" id="notifBell">
+                        <i class="fas fa-bell notification-bell"></i>
+                        <span class="notification-badge" id="notifBadge">0</span>
+                    </a>
+                    <div class="user-profile">
+                        <span class="user-name" id="userDisplayName">Loading...</span>
+                        <div class="logo-icon" style="width: 36px; height: 36px; border-radius: 50%;" id="userInitial">U
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div id="followUpsWrapper">
+                <!-- Overdue -->
+                <div class="card" id="overdueCard">
+                    <div class="card-header" onclick="toggleSection('overdueCard')">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <h3 style="font-size: 16px;">Overdue Follow-ups</h3>
+                            <span class="count-pill" id="overdueCount">0</span>
+                        </div>
+                        <span class="toggle-icon"></span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div id="overdueList" class="kpi-grid" style="padding: 24px;"></div>
+                    </div>
+                </div>
+
+                <!-- Today -->
+                <div class="card" id="todayCard">
+                    <div class="card-header" onclick="toggleSection('todayCard')">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <h3 style="font-size: 16px;">Today's Priority</h3>
+                            <span class="count-pill" id="todayCount">0</span>
+                        </div>
+                        <span class="toggle-icon"></span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div id="todayList" class="kpi-grid" style="padding: 24px;"></div>
+                    </div>
+                </div>
+
+                <!-- Upcoming -->
+                <div class="card" id="upcomingCard">
+                    <div class="card-header" onclick="toggleSection('upcomingCard')">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <h3 style="font-size: 16px;">Upcoming Follow-ups</h3>
+                            <span class="count-pill" id="upcomingCount">0</span>
+                        </div>
+                        <span class="toggle-icon"></span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div id="upcomingList" class="kpi-grid" style="padding: 24px;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('collapsed');
+        }
+
+        async function loadFollowups() {
+            try {
+                const res = await fetch('/api/crm/followups');
+                const data = await res.json();
+                if (!data.success) {
+                    console.error('API Error:', data.message);
+                    return;
+                }
+
+                renderCategory('overdueList', 'overdueCount', data.overdue, 'overdue');
+                renderCategory('todayList', 'todayCount', data.today, 'today');
+                renderCategory('upcomingList', 'upcomingCount', data.upcoming, 'upcoming');
+
+            } catch (err) {
+                console.error('Fetch Error:', err);
+            }
+        }
+
+        function renderCategory(containerId, countId, items, type) {
+            const container = document.getElementById(containerId);
+            const countEl = document.getElementById(countId);
+            countEl.innerText = items.length;
+            container.innerHTML = '';
+
+            if (items.length === 0) {
+                container.innerHTML = `<div class="card" style="padding: 20px; color: #999; grid-column: 1/-1;">No records found for this category.</div>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'kpi-card glass animate__animated animate__fadeInUp';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <div>
+                            <h4 style="font-size: 16px; font-weight: 700;">${item.name}</h4>
+                            <p style="font-size: 13px; color: var(--text-muted);">${item.phone}</p>
+                        </div>
+                        <span class="date-badge ${type}-bg">${item.follow_up_date}</span>
+                    </div>
+                    <div style="font-size: 13px; margin-bottom: 20px;">
+                        <p><strong>Status:</strong> ${item.status}</p>
+                        <p><strong>Notes:</strong> ${item.notes || 'No notes added.'}</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" style="padding: 8px 15px; font-size: 12px;" onclick="window.location.href='new-customer.html?editId=${item.id}'">Update</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        loadFollowups();
+
+        // Premium UI Transitions
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loading-screen');
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+            }, 800);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify OTP — Anugraha Kirloskar CRM</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        body {
+            background: #f4f7f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #eee;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .auth-header h1 {
+            color: #1f7a1f;
+            font-size: 22px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Verify OTP</h1>
+            <p>Enter the 6-digit code and set your new password.</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="verifyForm">
+            <div class="form-group">
+                <label>OTP Code</label>
+                <input type="text" id="otp" placeholder="123456" maxlength="6"
+                    style="text-align: center; font-size: 24px; letter-spacing: 10px;" required />
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" id="newPassword" placeholder="••••••••" required />
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;" id="verifyBtn">Verify & Reset</button>
+        </form>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phone = localStorage.getItem('resetPhone');
+            if (!phone) { alert('Session expired. Start again.'); window.location.href = 'forgot-password.html'; return; }
+
+            const otp = document.getElementById('otp').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) { alert('Passwords mismatch'); return; }
+
+            const verifyBtn = document.getElementById('verifyBtn');
+            verifyBtn.disabled = true;
+            verifyBtn.innerText = 'Processing...';
+
+            const res = await apiCall('/api/verify-otp', { phone, otp, newPassword });
+
+            if (res.success) {
+                alert('Password reset successful! Please login.');
+                window.location.href = 'login.html';
+            } else {
+                alert('Error: ' + res.message);
+                verifyBtn.disabled = false;
+                verifyBtn.innerText = 'Verify & Reset';
+            }
+        });
+    </script>
+</body>
+
+</html>

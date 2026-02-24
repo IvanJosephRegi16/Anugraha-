@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analytics — Anugraha Kirloskar CRM</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">AK</div>
+                <div class="logo-text">ANUGRAHA KIRLOSKAR</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span><span
+                        class="nav-text">Dashboard</span></a>
+                <a href="new-customer.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-text">New
+                        Customer</span></a>
+                <a href="view-customers.html" class="nav-item"><span class="nav-icon">👁</span><span
+                        class="nav-text">View Customers</span></a>
+                <a href="reports.html" class="nav-item active"><span class="nav-icon">📊</span><span
+                        class="nav-text">Reports</span></a>
+                <a href="follow-ups.html" class="nav-item"><span class="nav-icon">🔔</span><span class="nav-text">Follow
+                        Ups</span></a>
+                <a href="settings.html" class="nav-item"><span class="nav-icon">⚙</span><span
+                        class="nav-text">Settings</span></a>
+                <div style="flex: 1;"></div>
+                <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span><span
+                        class="nav-text">Logout</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-nav">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button id="sidebarToggle" class="btn" style="background: none; font-size: 20px;">☰</button>
+                    <h2 style="font-size: 18px; font-weight: 600;">Reports & Analytics</h2>
+                </div>
+                <div class="user-profile">
+                    <span class="user-name" id="userDisplayName">User</span>
+                    <div class="logo-icon" style="width: 36px; height: 36px; border-radius: 50%;" id="userInitial">U
+                    </div>
+                </div>
+            </header>
+
+            <div class="export-buttons">
+                <button class="btn btn-primary" onclick="exportData('csv')">📂 Export to CSV</button>
+                <button class="btn" style="background: #eee;" onclick="exportData('excel')">📊 Export to Excel</button>
+            </div>
+
+            <div class="report-grid">
+                <div class="card">
+                    <h3 style="font-size: 15px; margin-bottom: 20px;">Monthly Trends (Leads vs Converted)</h3>
+                    <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 15px; margin-bottom: 20px;">Product Interest Distribution</h3>
+                    <div class="chart-container"><canvas id="productChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 15px; margin-bottom: 20px;">Source Performance</h3>
+                    <div class="chart-container"><canvas id="sourceChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 15px; margin-bottom: 20px;">Regional (District) Performance</h3>
+                    <div class="chart-container"><canvas id="districtChart"></canvas></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        async function loadCharts() {
+            const res = await fetch('/api/crm/reports/data');
+            const data = await res.json();
+            if (!data.success) return;
+
+            // 1. Monthly Line Chart
+            new Chart(document.getElementById('monthlyChart'), {
+                type: 'line',
+                data: {
+                    labels: data.monthlyData.map(d => d.month),
+                    datasets: [
+                        { label: 'Leads', data: data.monthlyData.map(d => d.leads), borderColor: '#888', tension: 0.3 },
+                        { label: 'Converted', data: data.monthlyData.map(d => d.converted), borderColor: '#1f7a1f', backgroundColor: '#e8f5e9', fill: true, tension: 0.3 }
+                    ]
+                }
+            });
+
+            // 2. Product Bar Chart
+            new Chart(document.getElementById('productChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.productStats.map(d => d.product),
+                    datasets: [{ label: 'Interests', data: data.productStats.map(d => d.count), backgroundColor: '#1f7a1f' }]
+                },
+                options: { indexAxis: 'y' }
+            });
+
+            // 3. Source Pie Chart
+            new Chart(document.getElementById('sourceChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.sourceStats.map(d => d.source),
+                    datasets: [{ data: data.sourceStats.map(d => d.count), backgroundColor: ['#1f7a1f', '#2e7d32', '#43a047', '#66bb6a', '#a5d6a7', '#c8e6c9'] }]
+                }
+            });
+
+            // 4. District Performance
+            new Chart(document.getElementById('districtChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.districtStats.map(d => d.district),
+                    datasets: [{ label: 'Total Calls', data: data.districtStats.map(d => d.count), backgroundColor: '#2e7d32' }]
+                }
+            });
+        }
+
+        async function exportData(type) {
+            const res = await fetch('/api/crm/customers');
+            const data = await res.json();
+            if (!data.success) return;
+
+            let csv = 'Date,Name,Phone,Product,Status,Source,District,Outcome\\n';
+            data.customers.forEach(c => {
+                csv += `"${c.call_date}","${c.name}","${c.phone}","${c.product}","${c.status}","${c.source}","${c.district}","${c.outcome}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'Kirloskar_CRM_Report.' + type);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        loadCharts();
+    </script>
+</body>
+
+</html>

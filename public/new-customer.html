@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Customer — Anugraha Kirloskar CRM</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">AK</div>
+                <div class="logo-text">ANUGRAHA KIRLOSKAR</div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="new-customer.html" class="nav-item active">
+                    <span class="nav-icon">➕</span>
+                    <span class="nav-text">New Customer</span>
+                </a>
+                <a href="view-customers.html" class="nav-item">
+                    <span class="nav-icon">👁</span>
+                    <span class="nav-text">View Customers</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Reports</span>
+                </a>
+                <a href="follow-ups.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span class="nav-text">Follow Ups</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+                <div style="flex: 1;"></div>
+                <a href="#" class="nav-item" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button id="sidebarToggle" class="btn" style="background: none; font-size: 20px;">☰</button>
+                    <h2 style="font-size: 18px; font-weight: 600;" id="pageTitle">Add New Customer Lead</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <a href="follow-ups.html" class="notification-container" id="notifBell">
+                        <i class="fas fa-bell notification-bell"></i>
+                        <span class="notification-badge" id="notifBadge">0</span>
+                    </a>
+                    <div class="user-profile">
+                        <span class="user-name" id="userDisplayName">User Name</span>
+                        <div class="logo-icon" style="width: 36px; height: 36px; border-radius: 50%;" id="userInitial">U
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="card">
+                <form id="newCustomerForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <!-- Column 1 -->
+                        <div>
+                            <h3
+                                style="margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                                Customer Basic Info</h3>
+
+                            <div class="form-group">
+                                <label>Call Date <span style="color:red">*</span></label>
+                                <input type="date" id="call_date" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Customer Name <span style="color:red">*</span></label>
+                                <input type="text" id="name" placeholder="Enter Full Name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Phone Number (10 digits) <span style="color:red">*</span></label>
+                                <input type="tel" id="phone" placeholder="9876543210" maxlength="10" required>
+                                <small id="duplicateWarning"
+                                    style="color: #d9534f; display: none; font-weight: 600; margin-top: 5px; display: block;">
+                                    ⚠️ This phone exists. Adding new record will append call history.
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>District</label>
+                                <select id="district">
+                                    <option value="">Select District</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Soil Type</label>
+                                <input type="text" id="soil_type" placeholder="e.g. Red, Black, etc.">
+                            </div>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div>
+                            <h3
+                                style="margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                                Call Details</h3>
+
+                            <div class="form-group">
+                                <label>Call Status <span style="color:red">*</span></label>
+                                <select id="status" required>
+                                    <option value="Lead">Lead</option>
+                                    <option value="Converted">Converted</option>
+                                    <option value="Not Converted">Not Converted</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Source <span style="color:red">*</span></label>
+                                <select id="source" required>
+                                    <!-- Populated from settings -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Product Interested</label>
+                                <select id="product">
+                                    <option value="">Select Product</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Call Outcome</label>
+                                <select id="outcome">
+                                    <option value="Interested">Interested</option>
+                                    <option value="Not Interested">Not Interested</option>
+                                    <option value="Call Later">Call Later</option>
+                                    <option value="Switched Off">Switched Off</option>
+                                    <option value="Already Purchased">Already Purchased</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Follow-up Date</label>
+                                <input type="date" id="follow_up_date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="notes" rows="4"
+                            placeholder="Enter any specific requirements or details..."></textarea>
+                    </div>
+
+                    <div
+                        style="text-align: right; margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" class="btn" onclick="window.location.href='view-customers.html'"
+                            style="padding: 12px 20px; background: #eee; display: none;" id="cancelBtn">Cancel
+                            Edit</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 12px 30px;" id="saveBtn">Save
+                            Customer Record</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Set default date to today
+        document.getElementById('call_date').valueAsDate = new Date();
+
+        // Load dynamic settings (districts, sources, products)
+        async function loadDropdowns() {
+            const res = await fetch('/api/crm/settings');
+            const data = await res.json();
+            if (!data.success) return;
+
+            const populate = (id, list) => {
+                const el = document.getElementById(id);
+                list.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = opt.text = item.value;
+                    el.add(opt);
+                });
+            }
+
+            populate('district', data.districts);
+            populate('source', data.sources);
+            populate('product', data.products);
+        }
+
+        // Duplicate Check
+        const phoneInput = document.getElementById('phone');
+        const warn = document.getElementById('duplicateWarning');
+        warn.style.display = 'none';
+
+        phoneInput.addEventListener('blur', async () => {
+            if (phoneInput.value.length < 10) return;
+            const res = await fetch('/api/crm/customers/check/' + phoneInput.value);
+            const data = await res.json();
+            if (data.exists) {
+                warn.style.display = 'block';
+                // Pre-fill name and district if exists
+                document.getElementById('name').value = data.customer.name;
+                document.getElementById('district').value = data.customer.district || "";
+            } else {
+                warn.style.display = 'none';
+            }
+        });
+
+        // Submit form
+        document.getElementById('newCustomerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveBtn');
+            const originalText = saveBtn.innerText;
+            saveBtn.disabled = true;
+            saveBtn.innerText = 'Processing...';
+
+            const payload = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                district: document.getElementById('district').value,
+                call_date: document.getElementById('call_date').value,
+                status: document.getElementById('status').value,
+                source: document.getElementById('source').value,
+                product: document.getElementById('product').value,
+                soil_type: document.getElementById('soil_type').value,
+                outcome: document.getElementById('outcome').value,
+                follow_up_date: document.getElementById('follow_up_date').value,
+                notes: document.getElementById('notes').value
+            };
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const editId = urlParams.get('editId');
+
+            let res;
+            if (editId) {
+                // Update Call Info
+                res = await fetch('/api/crm/calls/' + editId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                res = await res.json();
+
+                // Also update Customer static info (name, district)
+                if (res.success && currentCustomerId) {
+                    await fetch('/api/crm/customers/' + currentCustomerId, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: payload.name, district: payload.district })
+                    });
+                }
+            } else {
+                res = await apiCall('/api/crm/customers', payload);
+            }
+
+            if (res.success) {
+                alert('Success: Record saved!');
+                window.location.href = 'view-customers.html';
+            } else {
+                alert('Error: ' + res.message);
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalText;
+            }
+        });
+
+        let currentCustomerId = null;
+
+        async function initEditMode() {
+            await loadDropdowns();
+            const urlParams = new URLSearchParams(window.location.search);
+            const editId = urlParams.get('editId');
+            if (editId) {
+                document.getElementById('pageTitle').innerText = 'Edit Customer Record';
+                document.getElementById('saveBtn').innerText = 'Update Record';
+                document.getElementById('cancelBtn').style.display = 'block';
+                document.getElementById('phone').readOnly = true; // Don't allow phone edit in this mode
+
+                const res = await fetch('/api/crm/calls/' + editId);
+                const data = await res.json();
+                console.log('Edit Mode Data:', data);
+                if (data.success) {
+                    const c = data.call;
+                    currentCustomerId = c.customer_id;
+                    document.getElementById('call_date').value = c.call_date;
+                    document.getElementById('name').value = c.name;
+                    document.getElementById('phone').value = c.phone;
+                    document.getElementById('district').value = c.district || "";
+                    document.getElementById('soil_type').value = c.soil_type || "";
+                    document.getElementById('status').value = c.status;
+                    document.getElementById('source').value = c.source;
+                    document.getElementById('product').value = c.product || "";
+                    document.getElementById('outcome').value = c.outcome;
+                    document.getElementById('follow_up_date').value = c.follow_up_date || "";
+                    document.getElementById('notes').value = c.notes || "";
+                    console.log('Form populated for editId:', editId);
+                } else {
+                    console.error('Failed to load edit data:', data.message);
+                }
+            }
+        }
+
+        initEditMode();
+    </script>
+</body>
+
+</html>
